@@ -98,3 +98,4 @@ module webaccess '../core/security/keyvault-access.bicep' = if (useKeyVault) {
 output FRONTEND_API_IDENTITY_PRINCIPAL_ID string = web.outputs.identityPrincipalId
 output FRONTEND_API_NAME string = web.outputs.name
 output FRONTEND_API_URI string = web.outputs.uri
+output hostname string = web. outputs.hostname
