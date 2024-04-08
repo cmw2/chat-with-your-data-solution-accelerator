@@ -21,10 +21,12 @@ $headers = @{
 $failureCount = 0
 
 foreach ($url in $urls) {
-    if ($url -match '\.(pdf|xls|xlsx|doc|docx)$') {
+    if ($url -match '\.(pdf|xls|xlsx|doc|docx|ppt|pptx)$') {
         Write-Host "Skipping URL $url. PDF and Office files are excluded."
         continue
     }
+
+    Write-Host "Submitting URL $url"
     
     $body = @{
         url = $url
