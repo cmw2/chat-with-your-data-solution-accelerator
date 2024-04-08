@@ -4,12 +4,12 @@ name: chat-with-your-data-solution-accelerator
 metadata:
   template: chat-with-your-data-solution-accelerator@1.7.0
 
-hooks:
-  postprovision:
-    shell: sh
-    continueOnError: false
-    interactive: false
-    run: ./scripts/config-appsvc-auth.sh
+# hooks:
+#   postprovision:
+#     shell: sh
+#     continueOnError: false
+#     interactive: false
+#     run: ./scripts/config-appsvc-auth.sh
     
 services:
   web:
