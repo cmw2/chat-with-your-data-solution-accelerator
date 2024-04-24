@@ -210,16 +210,6 @@ param logLevel string = 'INFO'
 @description('List of comma-separated languages to recognize from the speech input. Supported languages are listed here: https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=stt#supported-languages')
 param recognizedLanguages string = 'en-US,fr-FR,de-DE,it-IT'
 
-@description('The name of the Front Door endpoint to create. This must be globally unique.')
-param frontDoorEndpointName string = '${environmentName}-afd'
-
-@description('The name of the SKU to use when creating the Front Door profile.')
-@allowed([
-  'Standard_AzureFrontDoor'
-  'Premium_AzureFrontDoor'
-])
-param frontDoorSkuName string = 'Standard_AzureFrontDoor'
-
 var blobContainerName = 'documents'
 var queueName = 'doc-processing'
 var clientKey = '${uniqueString(guid(subscription().id, deployment().name))}${newGuidString}'
@@ -803,16 +793,6 @@ module storage 'core/storage/storage-account.bicep' = {
         name: 'doc-processing-poison'
       }
     ]
-  }
-}
-
-module frontDoor 'core/network/frontdoor.bicep' = {
-  scope: rg
-  name: 'front-door'
-  params: {
-    skuName: frontDoorSkuName
-    endpointName: frontDoorEndpointName
-    originHostName: web.outputs.hostname
   }
 }
 
