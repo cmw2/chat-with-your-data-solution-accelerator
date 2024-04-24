@@ -21,19 +21,19 @@ $headers = @{
 $failureCount = 0
 
 foreach ($url in $urls) {
-    if ($url -match '\.(pdf|xls|xlsx|doc|docx|ppt|pptx)$') {
-        Write-Host "Skipping URL $url. PDF and Office files are excluded."
+    if ($url -match '\.(xls|xlsx|doc|ppt|pptx)$') {
+        Write-Host "Skipping URL $url as it's extension is not supported."
         continue
     }
 
     Write-Host "Submitting URL $url"
-    
+
     $body = @{
         url = $url
     } | ConvertTo-Json
-    
+
     try {
-        $response = Invoke-RestMethod -Uri $functionUrl -Method Post -Body $body -Headers $headers -ContentType "application/json"        
+        $response = Invoke-RestMethod -Uri $functionUrl -Method Post -Body $body -Headers $headers -ContentType "application/json"
         Write-Host "Success: Submitted URL $url. Response: $response"
     } catch {
         Write-Host "Status: " $_.Exception.Response.StatusCode
