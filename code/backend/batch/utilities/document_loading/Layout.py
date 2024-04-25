@@ -10,13 +10,16 @@ class LayoutDocumentLoading(DocumentLoadingBase):
 
     def load(self, document_url: str) -> List[SourceDocument]:
         azure_form_recognizer_client = AzureFormRecognizerClient()
-        pages_content = azure_form_recognizer_client.begin_analyze_document_from_url(
-            document_url, use_layout=True
+        pages_content, title = (
+            azure_form_recognizer_client.begin_analyze_document_from_url(
+                document_url, use_layout=True
+            )
         )
         documents = [
             SourceDocument(
                 content=page["page_text"],
                 source=document_url,
+                title=title,
                 offset=page["offset"],
                 page_number=page["page_number"],
             )

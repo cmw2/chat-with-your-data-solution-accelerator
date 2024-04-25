@@ -4,6 +4,9 @@ from azure.identity import DefaultAzureCredential
 import html
 import traceback
 from .EnvHelper import EnvHelper
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AzureFormRecognizerClient:
@@ -83,6 +86,7 @@ class AzureFormRecognizerClient:
             # (if using layout) mark all the positions of headers
             roles_start = {}
             roles_end = {}
+            title = None
             for paragraph in form_recognizer_results.paragraphs:
                 # if paragraph.role!=None:
                 para_start = paragraph.spans[0].offset
@@ -93,6 +97,8 @@ class AzureFormRecognizerClient:
                 roles_end[para_end] = (
                     paragraph.role if paragraph.role is not None else "paragraph"
                 )
+                if paragraph.role == "title" and title is None:
+                    title = paragraph.content
 
             for page_num, page in enumerate(form_recognizer_results.pages):
                 tables_on_page = [
@@ -124,6 +130,7 @@ class AzureFormRecognizerClient:
                             html_role = self.form_recognizer_role_to_html.get(role)
                             if html_role is not None:
                                 page_text += f"<{html_role}>"
+
                         if position in roles_end.keys():
                             role = roles_end[position]
                             html_role = self.form_recognizer_role_to_html.get(role)
@@ -142,6 +149,6 @@ class AzureFormRecognizerClient:
                 )
                 offset += len(page_text)
 
-            return page_map
+            return page_map, title
         except Exception as e:
             raise ValueError(f"Error: {traceback.format_exc()}. Error: {e}")

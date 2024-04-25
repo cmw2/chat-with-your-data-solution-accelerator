@@ -4,6 +4,9 @@ from langchain.docstore.document import Document
 from langchain_community.document_loaders import WebBaseLoader
 from .DocumentLoadingBase import DocumentLoadingBase
 from ..common.SourceDocument import SourceDocument
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class WebDocumentLoading(DocumentLoadingBase):
@@ -25,6 +28,7 @@ class WebDocumentLoading(DocumentLoadingBase):
             SourceDocument(
                 content=document.page_content,
                 source=document.metadata["source"],
+                title=document.metadata["title"],
             )
             for document in documents
         ]
