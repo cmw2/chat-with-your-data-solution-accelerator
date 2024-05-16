@@ -106,7 +106,8 @@ class SourceDocument:
             blob_client = AzureBlobStorageClient()
             container_sas = blob_client.get_container_sas()
             url = url.replace("_SAS_TOKEN_PLACEHOLDER_", container_sas)
-        return f"[{self.title}]({url})"
+        # return f"[{self.title}]({url})"
+        return f"<{url}>"
 
 
 class SourceDocumentEncoder(json.JSONEncoder):
