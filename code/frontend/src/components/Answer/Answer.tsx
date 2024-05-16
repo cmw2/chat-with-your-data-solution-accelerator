@@ -51,6 +51,13 @@ export const Answer = ({
                 citationFilename = `${citation.filepath} - Part ${parseInt(citation.chunk_id) + 1}`;
             }
         }
+        else if (citation.url){
+            if (citation.title) {
+                citationFilename = `Citation ${index}: ` + citation.title;
+            } else {
+                citationFilename = `Citation ${index}: ` + citation.url;
+            }
+        }
         else {
             citationFilename = `Citation ${index}`;
         }
@@ -97,13 +104,13 @@ export const Answer = ({
                                 onClick={handleChevronClick} iconName={chevronIsExpanded ? 'ChevronDown' : 'ChevronRight'}
                                 />
                             </Stack>
-                            
+
                         </Stack>
                     </Stack.Item>
                 )}
-                
+
                 </Stack>
-                {chevronIsExpanded && 
+                {chevronIsExpanded &&
                     <div style={{ marginTop: 8, display: "flex", flexDirection: "column", height: "100%", gap: "4px", maxWidth: "100%" }}>
                         {parsedAnswer.citations.map((citation, idx) => {
                             return (
