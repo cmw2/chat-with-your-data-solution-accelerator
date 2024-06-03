@@ -68,7 +68,7 @@ class OutputParserTool(ParserBase):
             # Then update the citation object in the response, it needs to have filepath and chunk_id to render in the UI as a file
             messages[0]["content"]["citations"].append(
                 {
-                    "content": doc.get_markdown_url() + "\n\n\n" + doc.content,
+                    "content": doc.get_highlights_url() + "\n\n\n" + doc.content,
                     "id": doc.id,
                     "chunk_id": doc.chunk,
                     "title": doc.title,
@@ -96,15 +96,7 @@ class OutputParserTool(ParserBase):
         return messages
 
     def highlight_search_text(self, doc):
-        highlights = ""
-        highlights_text = ""
-        if doc.answers and doc.answers["text"] and doc.answers["highlights"]:
-            highlights = doc.answers["highlights"]
-            highlights_text = doc.answers["text"]
-
-        if doc.captions and doc.captions["text"] and doc.captions["highlights"]:
-            highlights = doc.captions["highlights"]
-            highlights_text = doc.captions["text"]
+        highlights, highlights_text = doc.get_highlights()
 
         if highlights:
             doc.content = re.sub(

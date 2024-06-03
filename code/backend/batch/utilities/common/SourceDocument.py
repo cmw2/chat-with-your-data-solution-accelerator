@@ -1,3 +1,4 @@
+import re
 from typing import Any, Optional, Type, Dict
 import hashlib
 import json
@@ -120,6 +121,32 @@ class SourceDocument:
             url = url.replace("_SAS_TOKEN_PLACEHOLDER_", container_sas)
         # return f"[{self.title}]({url})"
         return f"<{url}>"
+
+    def get_highlights(self):
+        highlights = ""
+        highlights_text = ""
+        if self.answers and self.answers["text"] and self.answers["highlights"]:
+            highlights = self.answers["highlights"]
+            highlights_text = self.answers["text"]
+
+        if self.captions and self.captions["text"] and self.captions["highlights"]:
+            highlights = self.captions["highlights"]
+            highlights_text = self.captions["text"]
+
+        return highlights, highlights_text
+
+    def get_highlights_url(self):
+        highlights, highlights_text = self.get_highlights()
+        if not highlights:
+            return self.get_markdown_url(self)
+        url = quote(self.source, safe=":/")
+        highlights_em = re.findall(r"<em>(.*?)</em>", highlights)
+        url_highlight = url + "#:~:text=" + quote(" ".join(highlights_em), safe=":/")
+        return (
+            f'<a href="{url_highlight}" target="_blank" rel="noopener">Open site</a><br/>'
+            + f"[{url}]({url_highlight})"
+        )
+        # return f"[{url}]({url_highlight})"
 
 
 class SourceDocumentEncoder(json.JSONEncoder):
