@@ -117,6 +117,8 @@ export const Answer = ({
                                 <span title={createCitationFilepath(citation, ++idx)} key={idx} onClick={() => onCitationClicked(citation)} className={styles.citationContainer}>
                                     <div className={styles.citation}>{idx}</div>
                                     {createCitationFilepath(citation, idx, true)}
+                                    <br/>Captions:{citation.metadata?.captions?.highlights}
+                                    <br/>Answers:{citation.metadata?.answers?.highlights}
                                 </span>);
                         })}
                     </div>

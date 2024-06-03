@@ -63,6 +63,22 @@ class OutputParserTool(ParserBase):
             doc = source_documents[idx]
             logger.debug(f"doc{idx}: {doc}")
 
+            if doc.answers and doc.answers["text"] and doc.answers["highlights"]:
+                doc.content = re.sub(
+                    "(?i)" + re.escape(doc.answers["text"]),
+                    lambda m: doc.answers["highlights"],
+                    doc.content,
+                )
+                # doc.content = re.sub(re.escape(doc.answers["text"]), doc.answers["highlights"], doc.content, flags=re.IGNORECASE)
+
+            if doc.captions and doc.captions["text"] and doc.captions["highlights"]:
+                doc.content = re.sub(
+                    "(?i)" + re.escape(doc.captions["text"]),
+                    lambda m: doc.captions["highlights"],
+                    doc.content,
+                )
+                # doc.content = re.sub(re.escape(doc.captions["text"]), doc.captions["highlights"], doc.content, flags=re.IGNORECASE)
+
             # Then update the citation object in the response, it needs to have filepath and chunk_id to render in the UI as a file
             messages[0]["content"]["citations"].append(
                 {
@@ -81,6 +97,8 @@ class OutputParserTool(ParserBase):
                         "chunk": doc.chunk,
                         "key": doc.id,
                         "filename": doc.get_filename(),
+                        "captions": doc.captions,
+                        "answers": doc.answers,
                     },
                 }
             )

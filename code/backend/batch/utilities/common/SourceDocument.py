@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import Any, Optional, Type, Dict
 import hashlib
 import json
 from urllib.parse import urlparse, quote
@@ -15,6 +15,8 @@ class SourceDocument:
         chunk: Optional[int] = None,
         offset: Optional[int] = None,
         page_number: Optional[int] = None,
+        captions: Optional[Dict[str, Any]] = None,
+        answers: Optional[Dict[str, Any]] = None,
     ):
         self.id = id
         self.content = content
@@ -23,9 +25,11 @@ class SourceDocument:
         self.chunk = chunk
         self.offset = offset
         self.page_number = page_number
+        self.captions = captions
+        self.answers = answers
 
     def __str__(self):
-        return f"SourceDocument(id={self.id}, title={self.title}, source={self.source}, chunk={self.chunk}, offset={self.offset}, page_number={self.page_number})"
+        return f"SourceDocument(id={self.id}, title={self.title}, source={self.source}, chunk={self.chunk}, offset={self.offset}, page_number={self.page_number}, captions={self.captions}, answers={self.answers})"
 
     def to_json(self):
         return json.dumps(self, cls=SourceDocumentEncoder)
@@ -44,6 +48,8 @@ class SourceDocument:
             dict_obj["chunk"],
             dict_obj["offset"],
             dict_obj["page_number"],
+            dict_obj["captions"],
+            dict_obj["answers"],
         )
 
     @classmethod
@@ -65,6 +71,8 @@ class SourceDocument:
             and parsed_url.netloc.endswith(".blob.core.windows.net")
             else ""
         )
+        captions = metadata.get("captions")
+        answers = metadata.get("answers")
         return cls(
             id=metadata.get("id", hash_key),
             content=content,
@@ -73,6 +81,8 @@ class SourceDocument:
             chunk=metadata.get("chunk", idx),
             offset=metadata.get("offset"),
             page_number=metadata.get("page_number"),
+            captions=captions,
+            answers=answers,
         )
 
     def convert_to_langchain_document(self):
@@ -87,6 +97,8 @@ class SourceDocument:
                 "chunk": self.chunk,
                 "offset": self.offset,
                 "page_number": self.page_number,
+                "captions": self.captions,
+                "answers": self.answers,
             },
         )
 
@@ -121,6 +133,8 @@ class SourceDocumentEncoder(json.JSONEncoder):
                 "chunk": obj.chunk,
                 "offset": obj.offset,
                 "page_number": obj.page_number,
+                "captions": obj.captions,
+                "answers": obj.answers,
             }
         return super().default(obj)
 
@@ -136,4 +150,6 @@ class SourceDocumentDecoder(json.JSONDecoder):
             chunk=obj["chunk"],
             offset=obj["offset"],
             page_number=obj["page_number"],
+            captions=obj["captions"],
+            answers=obj["answers"],
         )
