@@ -63,6 +63,8 @@ class OutputParserTool(ParserBase):
             doc = source_documents[idx]
             logger.debug(f"doc{idx}: {doc}")
 
+            self.highlight_search_text(doc)
+
             # Then update the citation object in the response, it needs to have filepath and chunk_id to render in the UI as a file
             messages[0]["content"]["citations"].append(
                 {
@@ -75,7 +77,7 @@ class OutputParserTool(ParserBase):
                     ),
                     "title": doc.title,
                     "filepath": doc.get_filename(include_path=True),
-                    "url": doc.source,  # doc.get_markdown_url(),
+                    "url": doc.get_highlights_url(),  # doc.get_markdown_url(),
                     "metadata": {
                         "offset": doc.offset,
                         "source": doc.source,
@@ -85,6 +87,8 @@ class OutputParserTool(ParserBase):
                         "chunk": doc.chunk,
                         "key": doc.id,
                         "filename": doc.get_filename(),
+                        # "captions": doc.captions,
+                        # "answers": doc.answers,
                     },
                 }
             )
@@ -94,3 +98,13 @@ class OutputParserTool(ParserBase):
         # everything in content needs to be stringified to work with Azure BYOD frontend
         messages[0]["content"] = json.dumps(messages[0]["content"])
         return messages
+
+    def highlight_search_text(self, doc):
+        highlights, highlights_text = doc.get_highlights()
+
+        if highlights:
+            doc.content = re.sub(
+                "(?i)" + re.escape(highlights_text),
+                lambda m: highlights,
+                doc.content,
+            )

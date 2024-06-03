@@ -1,4 +1,5 @@
-from typing import Optional, Type
+import re
+from typing import Any, Optional, Type, Dict
 import hashlib
 import json
 from urllib.parse import urlparse, quote
@@ -16,6 +17,8 @@ class SourceDocument:
         offset: Optional[int] = None,
         page_number: Optional[int] = None,
         chunk_id: Optional[str] = None,
+        captions: Optional[Dict[str, Any]] = None,
+        answers: Optional[Dict[str, Any]] = None,
     ):
         self.id = id
         self.content = content
@@ -25,9 +28,11 @@ class SourceDocument:
         self.offset = offset
         self.page_number = page_number
         self.chunk_id = chunk_id
+        self.captions = captions
+        self.answers = answers
 
     def __str__(self):
-        return f"SourceDocument(id={self.id}, title={self.title}, source={self.source}, chunk={self.chunk}, offset={self.offset}, page_number={self.page_number}, chunk_id={self.chunk_id})"
+        return f"SourceDocument(id={self.id}, title={self.title}, source={self.source}, chunk={self.chunk}, offset={self.offset}, page_number={self.page_number}, chunk_id={self.chunk_id}, captions={self.captions}, answers={self.answers})"
 
     def __eq__(self, other):
         if isinstance(self, other.__class__):
@@ -40,6 +45,8 @@ class SourceDocument:
                 and self.offset == other.offset
                 and self.page_number == other.page_number
                 and self.chunk_id == other.chunk_id
+                and self.captions == other.captions
+                and self.answers == other.answers
             )
         return False
 
@@ -61,6 +68,8 @@ class SourceDocument:
             dict_obj["offset"],
             dict_obj["page_number"],
             dict_obj["chunk_id"],
+            dict_obj["captions"],
+            dict_obj["answers"],
         )
 
     @classmethod
@@ -82,6 +91,8 @@ class SourceDocument:
             and parsed_url.netloc.endswith(".blob.core.windows.net")
             else ""
         )
+        captions = metadata.get("captions")
+        answers = metadata.get("answers")
         return cls(
             id=metadata.get("id", hash_key),
             content=content,
@@ -91,6 +102,8 @@ class SourceDocument:
             offset=metadata.get("offset"),
             page_number=metadata.get("page_number"),
             chunk_id=metadata.get("chunk_id"),
+            captions=captions,
+            answers=answers,
         )
 
     def get_filename(self, include_path=False):
@@ -111,6 +124,39 @@ class SourceDocument:
             url = url.replace("_SAS_TOKEN_PLACEHOLDER_", container_sas)
         return f"[{self.title}]({url})"
 
+    def get_highlights(self):
+        highlights = ""
+        highlights_text = ""
+        # if self.answers and self.answers["text"] and self.answers["highlights"]:
+        #     highlights = self.answers["highlights"]
+        #     highlights_text = self.answers["text"]
+
+        if (
+            self.captions and self.captions[0]
+        ):  # and self.captions[0].text and self.captions[0].highlights:
+            highlights = self.captions[0].highlights
+            highlights_text = self.captions[0].text
+
+        return highlights, highlights_text
+
+    def get_highlights_url(self):
+        url = quote(self.source, safe=":/")
+        highlights, highlights_text = self.get_highlights()
+        if highlights_text:
+            url_highlight = (
+                url
+                + "#:~:text="
+                + quote(" ".join(highlights_text.split()[:10]), safe=":/")
+            )
+        elif highlights:
+            highlights_em = re.findall(r"<em>(.*?)</em>", highlights)
+            url_highlight = (
+                url + "#:~:text=" + quote(" ".join(highlights_em), safe=":/")
+            )
+        else:
+            url_highlight = url
+        return url_highlight
+
 
 class SourceDocumentEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -124,6 +170,8 @@ class SourceDocumentEncoder(json.JSONEncoder):
                 "offset": obj.offset,
                 "page_number": obj.page_number,
                 "chunk_id": obj.chunk_id,
+                "captions": obj.captions,
+                "answers": obj.answers,
             }
         return super().default(obj)
 
@@ -140,4 +188,6 @@ class SourceDocumentDecoder(json.JSONDecoder):
             offset=obj["offset"],
             page_number=obj["page_number"],
             chunk_id=obj["chunk_id"],
+            captions=obj["captions"],
+            answers=obj["answers"],
         )

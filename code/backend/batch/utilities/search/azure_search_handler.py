@@ -172,6 +172,8 @@ class AzureSearchHandler(SearchHandlerBase):
                     chunk=source.get("chunk"),
                     offset=source.get("offset"),
                     page_number=source.get("sourcepage"),
+                    captions=source.get("@search.captions"),
+                    answers=source.get("answers"),
                 )
             )
         return source_documents
