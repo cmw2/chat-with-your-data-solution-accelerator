@@ -31,8 +31,19 @@ def add_url_embeddings(req: func.HttpRequest) -> func.HttpResponse:
             config = ConfigHelper.get_active_config_or_default()
             document_processor = DocumentProcessor()
             processors = list(
-                filter(lambda x: x.document_type == "url", config.document_processors)
+                filter(
+                    lambda x: url.lower().endswith("." + x.document_type),
+                    config.document_processors,
+                )
             )
+
+            if not processors:
+                processors = list(
+                    filter(
+                        lambda x: x.document_type == "url", config.document_processors
+                    )
+                )
+
             document_processor.process(source_url=url, processors=processors)
         except Exception:
             return func.HttpResponse(

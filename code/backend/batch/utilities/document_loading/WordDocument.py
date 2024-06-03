@@ -4,6 +4,9 @@ from docx import Document
 import requests
 from .DocumentLoadingBase import DocumentLoadingBase
 from ..common.SourceDocument import SourceDocument
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class WordDocumentLoading(DocumentLoadingBase):
@@ -32,12 +35,17 @@ class WordDocumentLoading(DocumentLoadingBase):
     def load(self, document_url: str) -> List[SourceDocument]:
         output = ""
         document = Document(self._download_document(document_url))
+        title = None
         for paragraph in document.paragraphs:
+            if paragraph.style.name == "Heading 1" and title is None:
+                title = paragraph.text
             output += f"{self._get_opening_tag(paragraph.style.name)}{paragraph.text}{self._get_closing_tag(paragraph.style.name)}\n"
+
         documents = [
             SourceDocument(
                 content=output,
                 source=document_url,
+                title=title,
                 offset=0,
                 page_number=0,
             )

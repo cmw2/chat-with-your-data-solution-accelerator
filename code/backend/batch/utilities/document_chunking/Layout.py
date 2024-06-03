@@ -16,6 +16,7 @@ class LayoutDocumentChunking(DocumentChunkingBase):
             list(map(lambda document: document.content, documents))
         )
         document_url = documents[0].source
+        document_title = documents[0].title
         splitter = MarkdownTextSplitter.from_tiktoken_encoder(
             chunk_size=chunking.chunk_size, chunk_overlap=chunking.chunk_overlap
         )
@@ -28,7 +29,7 @@ class LayoutDocumentChunking(DocumentChunkingBase):
                 SourceDocument.from_metadata(
                     content=chunked_content,
                     document_url=document_url,
-                    metadata={"offset": chunk_offset},
+                    metadata={"offset": chunk_offset, "title": document_title},
                     idx=idx,
                 )
             )
