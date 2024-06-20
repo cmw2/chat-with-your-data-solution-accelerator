@@ -43,83 +43,83 @@ module web '../core/host/appservice.bicep' = {
     appSettings: union(appSettings, {
       AZURE_AUTH_TYPE: authType
       USE_KEY_VAULT: useKeyVault ? useKeyVault : ''
-      AZURE_OPENAI_API_KEY: useKeyVault
-        ? openAIKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.CognitiveServices/accounts',
-              azureOpenAIName
-            ),
-            '2023-05-01'
-          ).key1
-      AZURE_SEARCH_KEY: useKeyVault
-        ? searchKeyName
-        : listAdminKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.Search/searchServices',
-              azureAISearchName
-            ),
-            '2021-04-01-preview'
-          ).primaryKey
-      AZURE_BLOB_ACCOUNT_KEY: useKeyVault
-        ? storageAccountKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.Storage/storageAccounts',
-              storageAccountName
-            ),
-            '2021-09-01'
-          ).keys[0].value
-      AZURE_FORM_RECOGNIZER_KEY: useKeyVault
-        ? formRecognizerKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.CognitiveServices/accounts',
-              formRecognizerName
-            ),
-            '2023-05-01'
-          ).key1
-      AZURE_CONTENT_SAFETY_KEY: useKeyVault
-        ? contentSafetyKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.CognitiveServices/accounts',
-              contentSafetyName
-            ),
-            '2023-05-01'
-          ).key1
-      AZURE_SPEECH_SERVICE_KEY: useKeyVault
-        ? speechKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.CognitiveServices/accounts',
-              speechServiceName
-            ),
-            '2023-05-01'
-          ).key1
-      AZURE_COMPUTER_VISION_KEY: (useKeyVault || computerVisionName == '')
-        ? computerVisionKeyName
-        : listKeys(
-            resourceId(
-              subscription().subscriptionId,
-              resourceGroup().name,
-              'Microsoft.CognitiveServices/accounts',
-              computerVisionName
-            ),
-            '2023-05-01'
-          ).key1
+      // AZURE_OPENAI_API_KEY: authType != 'rbac' ? useKeyVault
+      //   ? openAIKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.CognitiveServices/accounts',
+      //         azureOpenAIName
+      //       ),
+      //       '2023-05-01'
+      //     ).key1 : ''
+      // AZURE_SEARCH_KEY: authType != 'rbac' ? useKeyVault
+      //   ? searchKeyName
+      //   : listAdminKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.Search/searchServices',
+      //         azureAISearchName
+      //       ),
+      //       '2021-04-01-preview'
+      //     ).primaryKey : ''
+      // AZURE_BLOB_ACCOUNT_KEY: authType != 'rbac' ? useKeyVault
+      //   ? storageAccountKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.Storage/storageAccounts',
+      //         storageAccountName
+      //       ),
+      //       '2021-09-01'
+      //     ).keys[0].value : ''
+      // AZURE_FORM_RECOGNIZER_KEY: authType != 'rbac' ? useKeyVault
+      //   ? formRecognizerKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.CognitiveServices/accounts',
+      //         formRecognizerName
+      //       ),
+      //       '2023-05-01'
+      //     ).key1 : ''
+      // AZURE_CONTENT_SAFETY_KEY: authType != 'rbac' ? useKeyVault
+      //   ? contentSafetyKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.CognitiveServices/accounts',
+      //         contentSafetyName
+      //       ),
+      //       '2023-05-01'
+      //     ).key1 : ''
+      // AZURE_SPEECH_SERVICE_KEY: authType != 'rbac' ? useKeyVault
+      //   ? speechKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.CognitiveServices/accounts',
+      //         speechServiceName
+      //       ),
+      //       '2023-05-01'
+      //     ).key1 : ''
+      // AZURE_COMPUTER_VISION_KEY: authType != 'rbac' ? (useKeyVault || computerVisionName == '')
+      //   ? computerVisionKeyName
+      //   : listKeys(
+      //       resourceId(
+      //         subscription().subscriptionId,
+      //         resourceGroup().name,
+      //         'Microsoft.CognitiveServices/accounts',
+      //         computerVisionName
+      //       ),
+      //       '2023-05-01'
+      //     ).key1 : ''
     })
     keyVaultName: keyVaultName
     runtimeName: runtimeName
@@ -127,6 +127,7 @@ module web '../core/host/appservice.bicep' = {
     dockerFullImageName: dockerFullImageName
     scmDoBuildDuringDeployment: useDocker ? false : true
     healthCheckPath: healthCheckPath
+    managedIdentity: true
   }
 }
 
@@ -172,13 +173,13 @@ module searchRoleWeb '../core/security/role.bicep' = if (authType == 'rbac') {
   }
 }
 
-module webaccess '../core/security/keyvault-access.bicep' = if (useKeyVault) {
-  name: 'web-keyvault-access'
-  params: {
-    keyVaultName: keyVaultName
-    principalId: web.outputs.identityPrincipalId
-  }
-}
+// module webaccess '../core/security/keyvault-access.bicep' = if (useKeyVault) {
+//   name: 'web-keyvault-access'
+//   params: {
+//     keyVaultName: keyVaultName
+//     principalId: web.outputs.identityPrincipalId
+//   }
+// }
 
 output FRONTEND_API_IDENTITY_PRINCIPAL_ID string = web.outputs.identityPrincipalId
 output FRONTEND_API_NAME string = web.outputs.name

@@ -63,4 +63,12 @@ param azureAISearchName = searchServiceName == '' ? 'search-${resourceToken}' : 
 
 param azureSearchIndex = readEnvironmentVariable('AZURE_SEARCH_INDEX', 'index-${resourceToken}')
 param azureOpenAIResourceName = readEnvironmentVariable('AZURE_OPENAI_RESOURCE', 'openai-${resourceToken}')
-param storageAccountName = readEnvironmentVariable('AZURE_BLOB_ACCOUNT_NAME', 'str${resourceToken}')
+// param storageAccountName = readEnvironmentVariable('AZURE_BLOB_ACCOUNT_NAME', 'str${resourceToken}')
+
+param hostingPlanName = readEnvironmentVariable('AZURE_APP_SERVICE_PLAN', 'asp-${environmentName}')
+param websiteName = readEnvironmentVariable('AZURE_APP_SERVICE', 'app-${environmentName}')
+param applicationInsightsName = readEnvironmentVariable('AZURE_APP_INSIGHTS', 'ai-${environmentName}')
+param rgName = readEnvironmentVariable('AZURE_RESOURCE_GROUP', 'rg-${environmentName}')
+param keyVaultName = readEnvironmentVariable('AZURE_KEY_VAULT', 'kv-${environmentName}')
+param existingAOAIResourceGroup = readEnvironmentVariable('EXISTING_AZURE_OPENAI_RESOURCE_GROUP', '')
+param existingSearchResourceGroup = readEnvironmentVariable('EXISTING_AZURE_SEARCH_RESOURCE_GROUP', '')

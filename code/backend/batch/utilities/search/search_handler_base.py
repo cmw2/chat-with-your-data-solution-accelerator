@@ -5,7 +5,7 @@ from azure.search.documents import SearchClient
 
 
 class SearchHandlerBase(ABC):
-    _VECTOR_FIELD = "content_vector"
+    _VECTOR_FIELD = "embedding"  # "content_vector"
     _IMAGE_VECTOR_FIELD = "image_vector"
 
     def __init__(self, env_helper: EnvHelper):
