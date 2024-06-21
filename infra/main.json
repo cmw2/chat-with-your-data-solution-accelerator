@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "17558318042651217748"
+      "templateHash": "3840785930704814492"
     }
   },
   "parameters": {
@@ -1788,7 +1788,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "6932660993264101661"
+              "templateHash": "9914372777869388931"
             },
             "description": "Creates an Application Insights instance and a Log Analytics workspace."
           },
@@ -1816,81 +1816,6 @@
             {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
-              "name": "loganalytics",
-              "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
-                },
-                "mode": "Incremental",
-                "parameters": {
-                  "name": {
-                    "value": "[parameters('logAnalyticsName')]"
-                  },
-                  "location": {
-                    "value": "[parameters('location')]"
-                  },
-                  "tags": {
-                    "value": "[parameters('tags')]"
-                  }
-                },
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "4411803171372203725"
-                    },
-                    "description": "Creates a Log Analytics workspace."
-                  },
-                  "parameters": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "location": {
-                      "type": "string",
-                      "defaultValue": "[resourceGroup().location]"
-                    },
-                    "tags": {
-                      "type": "object",
-                      "defaultValue": {}
-                    }
-                  },
-                  "resources": [
-                    {
-                      "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2021-12-01-preview",
-                      "name": "[parameters('name')]",
-                      "location": "[parameters('location')]",
-                      "tags": "[parameters('tags')]",
-                      "properties": {
-                        "retentionInDays": 30,
-                        "features": {
-                          "searchVersion": 1
-                        },
-                        "sku": {
-                          "name": "PerGB2018"
-                        }
-                      }
-                    }
-                  ],
-                  "outputs": {
-                    "id": {
-                      "type": "string",
-                      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('name'))]"
-                    },
-                    "name": {
-                      "type": "string",
-                      "value": "[parameters('name')]"
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
               "name": "applicationinsights",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -1911,7 +1836,7 @@
                     "value": "[parameters('applicationInsightsDashboardName')]"
                   },
                   "logAnalyticsWorkspaceId": {
-                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'loganalytics'), '2022-09-01').outputs.id.value]"
+                    "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
                   }
                 },
                 "template": {
@@ -3241,10 +3166,7 @@
                     }
                   }
                 }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'loganalytics')]"
-              ]
+              }
             }
           ],
           "outputs": {
@@ -3266,11 +3188,11 @@
             },
             "logAnalyticsWorkspaceId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'loganalytics'), '2022-09-01').outputs.id.value]"
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
             },
             "logAnalyticsWorkspaceName": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'loganalytics'), '2022-09-01').outputs.name.value]"
+              "value": "[parameters('logAnalyticsName')]"
             }
           }
         }

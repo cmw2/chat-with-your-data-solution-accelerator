@@ -5,13 +5,17 @@ param applicationInsightsDashboardName string = ''
 param location string = resourceGroup().location
 param tags object = {}
 
-module logAnalytics 'loganalytics.bicep' = {
-  name: 'loganalytics'
-  params: {
-    name: logAnalyticsName
-    location: location
-    tags: tags
-  }
+// module logAnalytics 'loganalytics.bicep' = {
+//   name: 'loganalytics'
+//   params: {
+//     name: logAnalyticsName
+//     location: location
+//     tags: tags
+//   }
+// }
+
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
+  name: logAnalyticsName
 }
 
 module applicationInsights 'applicationinsights.bicep' = {
@@ -21,7 +25,7 @@ module applicationInsights 'applicationinsights.bicep' = {
     location: location
     tags: tags
     dashboardName: applicationInsightsDashboardName
-    logAnalyticsWorkspaceId: logAnalytics.outputs.id
+    logAnalyticsWorkspaceId: logAnalytics.id
   }
 }
 
@@ -29,5 +33,5 @@ output applicationInsightsConnectionString string = applicationInsights.outputs.
 output applicationInsightsInstrumentationKey string = applicationInsights.outputs.instrumentationKey
 output applicationInsightsName string = applicationInsights.outputs.name
 output applicationInsightsId string = applicationInsights.outputs.id
-output logAnalyticsWorkspaceId string = logAnalytics.outputs.id
-output logAnalyticsWorkspaceName string = logAnalytics.outputs.name
+output logAnalyticsWorkspaceId string = logAnalytics.id
+output logAnalyticsWorkspaceName string = logAnalytics.name
