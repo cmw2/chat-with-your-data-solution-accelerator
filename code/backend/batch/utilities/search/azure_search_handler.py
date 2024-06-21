@@ -168,10 +168,10 @@ class AzureSearchHandler(SearchHandlerBase):
                     id=source.get("id"),
                     content=source.get("content"),
                     title=source.get("title"),
-                    source=source.get("source"),
+                    source=source.get("sourcefile"),
                     chunk=source.get("chunk"),
                     offset=source.get("offset"),
-                    page_number=source.get("page_number"),
+                    page_number=source.get("sourcepage"),
                 )
             )
         return source_documents
