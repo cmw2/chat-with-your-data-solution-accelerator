@@ -54,6 +54,13 @@ export const Answer = ({
                 citationFilename = `${citation.filepath} - Part ${citation.chunk_id}`;
             }
         }
+        else if (citation.url){
+            if (citation.title) {
+                citationFilename = citation.title;
+            } else {
+                citationFilename = citation.url;
+            }
+        }
         else {
             citationFilename = `Citation ${index}`;
         }
@@ -110,10 +117,30 @@ export const Answer = ({
                     <div ref={refContainer} style={{ marginTop: 8, display: "flex", flexDirection: "column", height: "100%", gap: "4px", maxWidth: "100%" }}>
                         {parsedAnswer.citations.map((citation, idx) => {
                             return (
-                                <span title={createCitationFilepath(citation, ++idx)} key={idx} onClick={() => onCitationClicked(citation)} className={styles.citationContainer}>
-                                    <div className={styles.citation} key={idx}>{idx}</div>
-                                    {createCitationFilepath(citation, idx, true)}
-                                </span>);
+                                <>
+                                    {citation.url ? (
+                                        <a
+                                        href={citation.url}
+                                        title={createCitationFilepath(citation, ++idx)}
+                                        tabIndex={0}
+                                        role="link"
+                                        key={idx}
+                                        className={styles.citationContainer}
+                                        aria-label={createCitationFilepath(citation, idx)}
+                                        target="_blank" // Add target="_blank" to open in a new tab
+                                        rel="noopener noreferrer" // Add rel="noopener noreferrer" for security reasons
+                                        >
+                                            <div className={styles.citation}>{idx}</div>
+                                            {createCitationFilepath(citation, idx, true)}
+                                        </a>
+                                    ) : (
+                                        <span title={createCitationFilepath(citation, ++idx)} key={idx} onClick={() => onCitationClicked(citation)} className={styles.citationContainer}>
+                                        <div className={styles.citation} key={idx}>{idx}</div>
+                                        {createCitationFilepath(citation, idx, true)}
+                                    </span>
+                                    )}
+                                </>
+                            );
                         })}
                     </div>
                 }

@@ -75,7 +75,7 @@ class OutputParserTool(ParserBase):
                     ),
                     "title": doc.title,
                     "filepath": doc.get_filename(include_path=True),
-                    "url": doc.get_markdown_url(),
+                    "url": doc.source,  # doc.get_markdown_url(),
                     "metadata": {
                         "offset": doc.offset,
                         "source": doc.source,
